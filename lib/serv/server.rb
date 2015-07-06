@@ -12,6 +12,8 @@ require File.expand_path('../connection_dispatcher', __FILE__)
 require File.expand_path('../gws_holder', __FILE__)
 require File.expand_path('../system_tick_server', __FILE__)
 require File.expand_path('../connections_manager', __FILE__)
+require File.expand_path('../connection/system_tick_listener', __FILE__)
+require File.expand_path('../connection/message_parser', __FILE__)
 
 class Server < Reel::Server::HTTP
   include Celluloid::Logger
@@ -65,6 +67,7 @@ class ServerGroup < Celluloid::SupervisionGroup
   supervise Server, as: :reel
   supervise GwsHolder, as: :gws_holder
   supervise ConnectionsManager, as: :c_manager
+  supervise Connection::SystemTickListener, as: :s_t_listener
   pool ConnectionDispatcher, as: :conn_dispatcher, size: ConnectionsManager::FETCH_BATCH_SIZE
 
 end

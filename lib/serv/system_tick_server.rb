@@ -11,7 +11,7 @@ class SystemTickServer
   def run
     now = Time.now.to_f
     sleep now.ceil - now + 0.001
-    every(1) do
+    every(0.5) do
       publish 'system_tick'
     end
   end

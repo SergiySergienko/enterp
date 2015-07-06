@@ -5,6 +5,7 @@
 #
 class GwsHolder
   include Celluloid
+  include Celluloid::Notifications
 
   attr_accessor :avatars, :current_a_index
 
@@ -12,6 +13,10 @@ class GwsHolder
     @avatars = {}
     @current_a_index = 0
     async.run_dead_check
+  end
+
+  def get_avatars
+    @avatars
   end
 
   def get_a_index
@@ -32,11 +37,14 @@ class GwsHolder
 
   def add_avatar(avatar)
     # exclusive do
-      puts "Register new avatar in global space : #{@current_a_index}"
+      puts "Register new avatar in global space : #{avatar.get_global_a_index}"
       key = "#{avatar.get_global_a_index}"
       # avatar.async.set_global_a_index(@current_a_index)
       @avatars[key] = avatar
-      inc_a_index
+
+      publish('new_private_message', authorise_msg(avatar, "0:#{key}"))
+      # registered_avatar_keys = @avatars.values.map(&:get_global_a_index).join(",")
+      # publish('new_broad_message', "999|91:#{registered_avatar_keys}")
     # end
   end
 
@@ -47,7 +55,7 @@ class GwsHolder
 
       @avatars.delete(key)
 
-      dec_a_index
+
 
     # end
   end
@@ -61,6 +69,10 @@ class GwsHolder
   end
 
   private
+
+  def authorise_msg(avatar, msg)
+    "#{avatar.get_global_a_index}|#{msg}"
+  end
 
   def check_for_dead
     @avatars.each do |key, c_actor|

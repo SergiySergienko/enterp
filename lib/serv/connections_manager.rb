@@ -7,7 +7,7 @@ class ConnectionsManager
   include Celluloid::Notifications
 
   MAX_ACTIVE_CONNECTIONS_COUNT = 200
-  FETCH_BATCH_SIZE = 50
+  FETCH_BATCH_SIZE = 2
 
   attr_accessor :active_connections, :pending_connections, :current_connections_count
 
@@ -60,7 +60,7 @@ class ConnectionsManager
 
   def proceed_next_batch
     c_batch = get_next_pendings(FETCH_BATCH_SIZE)
-    puts "PROCEED PENDING #{c_batch.size.inspect}"
+    # puts "PROCEED PENDING #{c_batch.size.inspect}"
     if c_batch.length > 0
       if !((get_current_connections_count + c_batch.length) > MAX_ACTIVE_CONNECTIONS_COUNT)
         c_batch.each do |socket|

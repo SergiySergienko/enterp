@@ -16,6 +16,13 @@
             padding: 1em;
         }
     </style>
+
+    <script type="text/javascript" src="./javascript/phaser.js"></script>
+    <script type="text/javascript" src="./javascript/heartbeat.js"></script>
+    <script type="text/javascript" src="./javascript/keyboard_layout.js"></script>
+    <script type="text/javascript" src="./javascript/message_parser.js"></script>
+    <script type="text/javascript" src="./javascript/entities_state_holder.js"></script>
+    <script type="text/javascript" src="./javascript/event_listeners.js"></script>
 </head>
 <script>
     var SocketKlass = "MozWebSocket" in window ? MozWebSocket : WebSocket;
@@ -27,15 +34,13 @@
         ws.onclose = function() {
             document.getElementById('current-time').innerHTML = "Closed";
         };
+        ws.onmessage = function(event) {
+            event_listener_dispatcher.proceed_received_message(event.data);
+            document.getElementById('current-time').innerHTML = event.data;
+        };
 
-
-//    ws.onmessage = function(msg){
-//        document.getElementById('current-time').innerHTML = msg.data;
-//    }
-//    for(i=0;i<=100;i++) {
-//        ws.send({});
-//    }
 </script>
+<script type="text/javascript" src="./javascript/game.js"></script>
 <body>
 <div id="content">
     <h1>Time Server Example</h1>

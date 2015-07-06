@@ -2,13 +2,22 @@ module Connection
   class CheckPendingListener
     include Celluloid
     include Celluloid::Logger
-    include Celluloid::Notifications
+    # include Celluloid::Notifications
 
-    attr_accessor :socket, :check_timer, :a_id
+    attr_accessor :socket, :check_timer, :a_id, :message_dispatcher, :avatar
     trap_exit :actor_died
+
 
     def set_avatar_id(aid)
       @a_id = aid
+    end
+
+    def set_avatar_instance(avatar)
+      @avatar = avatar
+    end
+
+    def set_message_dispatcher(dispatcher)
+      @message_dispatcher = dispatcher
     end
 
     def start_listening(websocket)
@@ -27,16 +36,12 @@ module Connection
     def read_from_sock
       msg = @socket.read
       puts "New message from socket #{msg.inspect}"
-      publish('new_broad_message', authorise_msg(msg))
+      @message_dispatcher.async.dispatch_incoming_message(msg)
       return
     rescue Reel::SocketError, EOFError, IOError, Errno::ECONNRESET
       info "Reader WS client disconnected"
       stop_timer!
       terminate
-    end
-
-    def authorise_msg(msg)
-      "#{@a_id}|#{msg}"
     end
 
     def stop_timer!
